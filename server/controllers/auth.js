@@ -2,13 +2,16 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import sgMail from "@sendgrid/mail";
+import dotenv from "dotenv";
+dotenv.config();
 
-const api_key =
-  "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";
+const jwtSecret = process.env.JWT_SECRET;
+console.log(jwtSecret);
+
+const api_key = process.env.SENDGRID_API_KEY;
+console.log(api_key);
 
 sgMail.setApiKey(api_key);
-
-console.log(api_key);
 
 /* REGISTER USER */
 export const register = async (req, res) => {
@@ -41,16 +44,21 @@ export const register = async (req, res) => {
     });
     const savedUser = await newUser.save();
 
-    // Send email after successful registration
+    // Send custom email after successful registration
     const message = {
       to: email, // Send to the email of the new registered user
       from: {
         name: "Cyber Forge",
         email: "cyberforge1@cyberforge1.net",
       },
-      subject: "Hello from Cyber Forge",
-      text: "Hello from Cyber Forge",
-      html: "<h1>Welcome to Cyber Forge</h1>",
+      subject: "Welcome to Cyber Forge",
+      html: `
+          <h1>Hello ${firstName} ${lastName},</h1>
+          <p>Welcome to Cyber Forge! We are excited to have you on board.</p>
+          <p>Thank you for joining our community. We hope you have a great experience here.</p>
+          <p>Best regards,</p>
+          <p>The Cyber Forge Team</p>
+        `,
     };
 
     sgMail
